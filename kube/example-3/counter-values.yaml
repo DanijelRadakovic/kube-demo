@@ -1,0 +1,25 @@
+nameOverride: counter
+
+deployment:
+  image:
+    repository: danijelradakovic/counter
+    tag: "latest"
+  containerPort: 8000
+  probes:
+    initialDelaySeconds: 3
+    livenessPath: /probe/liveness
+    readinessPath: /probe/readiness
+  replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: example.local # overwrite with helm cli
+      paths:
+        - path: /counter
+          pathType: ImplementationSpecific

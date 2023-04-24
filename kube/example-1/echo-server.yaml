@@ -1,0 +1,20 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: echo
+  labels:
+    app: echo
+spec:
+  containers:
+    - name: echo
+      image: kicbase/echo-server:1.0
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: echo
+spec:
+  selector:
+    app: echo
+  ports:
+    - port: 8080

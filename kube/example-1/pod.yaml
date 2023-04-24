@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: counter
+spec:
+  containers:
+    - name: counter
+      image: danijelradakovic/counter
+      ports:
+        - containerPort: 8000
+      livenessProbe:
+        httpGet:
+          port: 8000
+          path: /probe/liveness
+        initialDelaySeconds: 3
+        periodSeconds: 3
+      readinessProbe:
+        httpGet:
+          port: 8000
+          path: /probe/readiness
+        initialDelaySeconds: 3
+        periodSeconds: 3
