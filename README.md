@@ -85,7 +85,7 @@ helm upgrade --install \
     echo helm/app-1 \
     --namespace demo \
     --create-namespace \
-    --values /kube/example-3/echo-values.yaml \
+    --values kube/example-3/echo-values.yaml \
     --set "ingress.hosts[0].host=$INGRESS_HOST.nip.io" \
     --wait
 
