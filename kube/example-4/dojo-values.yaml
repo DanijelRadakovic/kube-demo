@@ -1,0 +1,43 @@
+nameOverride: dojo
+
+deployment:
+  image:
+    # Overrides this
+    repository: danijelradakovic/dojo
+    tag: 0.1.0-alpine
+  containerPort: 8080
+  probes:
+    initialDelaySeconds: 3
+    livenessPath: /probe/liveness
+    readinessPath: /probe/readiness
+  replicaCount: 1
+  podAnnotations: {}
+  revisionHistoryLimit: 2
+
+# ConfigMap (=environment variables)
+configmap:
+  data:
+    DB_ENDPOINT: postgresql.postgresql
+    DB_PORT: "5432"
+    DB_NAME: postgres
+
+
+# Secret (=sensitive environment variables)
+secret:
+  data:
+    DB_USER: postgres # override with helm cli
+    DB_PASS: OvYmBagoZ6 # override with helm cli
+
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: example.local # overwrite with helm cli
+      paths:
+        - path: /
+          pathType: ImplementationSpecific

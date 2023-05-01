@@ -1,0 +1,14 @@
+{{- if .Values.localDashboards -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "service.fullname" . }}-local-dashboards
+  labels:
+    grafana_dashboard: "1"
+{{ include  "service.labels" . | indent 4 }}
+data:
+  {{- range $key, $value := .Values.dashboards }}
+  {{ $key }}.json: |-
+    {{ $value | b64dec | nindent 4 }}
+  {{- end }}
+{{- end }}

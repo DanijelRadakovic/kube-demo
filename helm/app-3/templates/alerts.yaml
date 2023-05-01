@@ -1,0 +1,37 @@
+{{- if .Values.alerts.enabled }}
+{{ $numRulesEnabled := 0 }}
+{{- range $name, $value := .Values.alerts.rules }}
+  {{ with $value }}
+    {{- if .enabled }}
+      {{ $numRulesEnabled = add1 $numRulesEnabled }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- if gt $numRulesEnabled 0 }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name:  {{ include "service.fullname" . }}-rules
+  labels:
+{{ include  "service.labels" . | indent 4 }}
+spec:
+  groups:
+    - name: service.rules
+      rules:
+        {{- range $name, $value := .Values.alerts.rules }}
+        {{ with $value }}
+        {{- if .enabled }}
+        - alert: {{ $name }}
+          expr: {{ .expr | quote }}
+          for: {{ .for }}
+          labels:
+            severity: {{ .severity }}
+            owner: {{ or .owner $.Values.owner }}
+          annotations:
+            summary: {{ .summary }}
+            description: {{ .description }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+{{- end }}
+{{- end }}

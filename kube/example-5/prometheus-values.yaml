@@ -1,0 +1,6 @@
+server:
+  ingress:
+    enabled: true
+alertmanager:
+  ingress:
+    enabled: true

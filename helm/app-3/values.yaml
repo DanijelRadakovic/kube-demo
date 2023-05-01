@@ -1,0 +1,95 @@
+# Default values for app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+deployment:
+  image:
+    # Overrides this
+    repository: ~
+    tag: ~
+  containerPort: 8080
+  probes:
+    initialDelaySeconds: 30
+    livenessPath: /health
+    readinessPath: /health
+  replicaCount: 1
+  podAnnotations: {}
+  revisionHistoryLimit: 2
+
+# ConfigMap (=environment variables)
+configmap:
+  data: {}
+
+# Secret (=sensitive environment variables)
+secret:
+  data: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# Service monitor (=prometheus scrape description)
+servicemonitor:
+  enabled: true # enabled by default
+  interval: 15s
+  path: /metrics
+
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+# runAsUser: 1000
+resources:
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+alerts:
+  enabled: false
+  rules: {}
+#    HTTP5XXErrors:
+#      summary: "Service's 5XX Response Rate More than .1%"
+#      description: "ServiceName 5XX Response Rate Alert"
+#      expr: "sum(rate(api_responses{status=~'5.*'}[5m])) / sum(rate(api_responses[5m])) > .001"
+#      for: 5m
+#      severity: warning
+#      enabled: true
+
+dashboards: []
+#  - app: <base64 encoded dashboard json configuration>

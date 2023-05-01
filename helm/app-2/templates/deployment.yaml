@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "service.fullname" . }}
+  labels:
+{{ include  "service.labels" . | nindent 4 }}
+  annotations:
+    checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{ include  "service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{ include  "service.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ include "service.name" . }}
+          image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: {{ .Values.deployment.containerPort }}
+          envFrom:
+            - configMapRef:
+                name:  {{ include "service.fullname" . }}
+            - secretRef:
+                name:  {{ include "service.fullname" . }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
+            httpGet:
+              path: {{ .Values.deployment.probes.livenessPath }}
+              port: http
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
+            httpGet:
+              path: {{ .Values.deployment.probes.readinessPath }}
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        # default soft podAntiAffinity
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - {{ include "service.name" . }}
+                topologyKey: "kubernetes.io/hostname"
+      {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

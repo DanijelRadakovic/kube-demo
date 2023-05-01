@@ -1,0 +1,77 @@
+defaultRules:
+  create: false
+
+alertmanager:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    paths: ["/", "/*"]
+    hosts:
+      - alertmanager.$INGRESS_HOST.nip.io
+  alertmanagerSpec:
+    logLevel: info
+    retention: 120h
+
+grafana:
+  enabled: true
+  forceDeployDashboards: true
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+      watchMethod: WATCH
+    datasources:
+      enabled: true
+      searchNamespace: ALL
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    labels:
+      app: "grafana"
+    hosts:
+      - grafana.$INGRESS_HOST.nip.io
+    path: /
+  grafana.ini:
+    users:
+      default_theme: dark
+      auto_assign_org_role: Editor
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki:3100
+      access: proxy
+    - name: Jaeger
+      type: jaeger
+      url: http://jaeger-query.observability:16686
+      access: proxy
+
+prometheus:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    paths: ["/", "/*"]
+    hosts:
+      - prometheus.$INGRESS_HOST.nip.io
+  prometheusSpec:
+    ruleSelectorNilUsesHelmValues: false
+    ruleSelector:
+      matchLabels:
+        app.kubernetes.io/managed-by: Helm
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector:
+      matchLabels:
+        app.kubernetes.io/managed-by: Helm
+    podMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelector:
+      matchLabels:
+        app.kubernetes.io/managed-by: Helm
+    podMonitorNamespaceSelector: {}
+
+kubeEtcd:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
