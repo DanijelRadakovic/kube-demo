@@ -139,6 +139,7 @@ helm upgrade --install \
     --create-namespace \
     --values kube/example-4/dojo-values.yaml \
     --set "ingress.hosts[0].host=$INGRESS_HOST.nip.io" \
+    --set "secret.data.DB_PASS=$POSTGRES_PASSWORD" \
     --wait
 ```
 Test app:
@@ -155,7 +156,7 @@ Delete the postgresql:
 ```shell
 helm -n postgresql uninstall postgresql
 kubectl -n postgresql get pvc
-kubectl -n postgresql pvc data-postgresql-0
+kubectl -n postgresql delete pvc data-postgresql-0
 kubectl get pv -A
 kubectl delete pv <name of pv for postgresql>
 ```
@@ -177,7 +178,7 @@ helm upgrade --install \
     --create-namespace \
     --values kube/example-5/prometheus-values.yaml \
     --set "server.ingress.hosts[0]=prometheus.$INGRESS_HOST.nip.io" \
-    --set "alertmanager.ingress.hosts[0]=alertmanager.$INGRESS_HOST.nip.io" \
+    --set "alertmanager.ingress.hosts[0].host=alertmanager.$INGRESS_HOST.nip.io" \
     --wait
 
 echo "Prometheus URL: http://prometheus.$INGRESS_HOST.nip.io"
@@ -197,7 +198,7 @@ helm upgrade --install \
     grafana grafana/grafana \
     --namespace monitoring \
     --create-namespace \
-    --values kube/example-5/grafana-values.yml \
+    --values kube/example-5/grafana-values.yaml \
     --set "ingress.hosts[0]=grafana.$INGRESS_HOST.nip.io" \
     --wait
 
@@ -328,6 +329,7 @@ helm upgrade --install \
     --create-namespace \
     --values kube/example-6/dojo-values.yaml \
     --set "ingress.hosts[0].host=$INGRESS_HOST.nip.io" \
+    --set "secret.data.DB_PASS=$POSTGRES_PASSWORD" \
     --wait
 ```
 

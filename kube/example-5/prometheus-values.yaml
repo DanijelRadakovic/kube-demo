@@ -1,6 +1,13 @@
 server:
   ingress:
     enabled: true
+    hosts:
+      - prometheus.$INGRESS_HOST.nip.io
 alertmanager:
   ingress:
     enabled: true
+    hosts:
+      - host: alertmanager.$INGRESS_HOST.nip.io
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
